@@ -1,6 +1,18 @@
 import sys
 import pygame
-from random import choice
+from random import randint
+
+
+class Rocket:
+    def __init__(self, x, y, radius, color):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.color = color
+
+    def draw(self, win):
+        pygame.draw.circle(screen, self.color, (self.x, self.y), self.radius)
+
 
 skin = '1'
 
@@ -35,11 +47,6 @@ elif skin == '4':
     skin = 'МЧС'
 
 
-def terminate():
-    pygame.quit()
-    sys.exit()
-
-
 def start_screen():
     intro_text = [" " * 55 + "Copter",
                   "",
@@ -60,7 +67,9 @@ def start_screen():
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                terminate()
+                pygame.quit()
+                print('Игра закрыта')
+                input()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
                 return  # начинаем игру
@@ -80,6 +89,8 @@ clock = pygame.time.Clock()
 start_screen()
 
 running = True
+
+rockets = []
 
 # спрайты
 
@@ -126,7 +137,9 @@ while True:
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            terminate()
+            pygame.quit()
+            print('Игра закрыта')
+            input()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RIGHT:
                 speed_x = 5
@@ -147,6 +160,22 @@ while True:
                 up_key = False
 
     screen.blit(bg, (0, 0))
+
+    if len(rockets) < 3:
+        n = Rocket(width, randint(0, 1080), 30, 'red')
+        rockets.append(n)
+
+    for rocket in rockets:
+        if 0 < rocket.x < (width + 1):
+            rocket.x -= 10
+            rocket.draw(screen)
+            h = pygame.Rect(x, y, 256, 256)
+            if h.collidepoint(rocket.x, rocket.y) or h.collidepoint(rocket.x, rocket.y):
+                pygame.quit()
+                print('Игра окончена')
+                input()
+        else:
+            rockets.pop(rockets.index(rocket))
 
     if side == "right":
         screen.blit(heli_right, (x, y))
